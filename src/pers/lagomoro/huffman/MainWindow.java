@@ -15,7 +15,7 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	JTextField help;
-	JLabel treeNode, treeWeight;
+	JLabel treeNode, treeWeight, treeHeight, animate, speed;
 	CanvasPanel canvas;
 
 	public MainWindow(){
@@ -24,9 +24,10 @@ public class MainWindow extends JFrame {
 	}
 	
 	protected void initialize() {
-		this.setTitle("数据结构课程设计演示程序 - 201800301015 王永睿");
+		this.setTitle("数据结构课程设计演示系统 - 哈夫曼编/译码器 - 201800301015 王永睿");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setSize(1024, 624);
+		//this.setSize(1024, 624);
+		this.setSize(1280, 768);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
 		this.setLayout(null);
@@ -46,7 +47,7 @@ public class MainWindow extends JFrame {
 		this.add(label_1);
 		
 		y += height + padding;
-		JButton btn_1 = new JButton("初始化（Initialization）");
+		JButton btn_1 = new JButton("手动初始化（Initialization）");
 		btn_1.setFocusPainted(false);
 		btn_1.setBounds(x, y, width, height);
 		btn_1.addMouseListener(new MouseAdapter() {
@@ -72,7 +73,7 @@ public class MainWindow extends JFrame {
 		this.add(btn_2);
 		
 		y += height + padding;
-		JButton btn_3= new JButton("解码（Decoding）");
+		JButton btn_3 = new JButton("解码（Decoding）");
 		btn_3.setFocusPainted(false);
 		btn_3.setBounds(x, y, width, height);
 		btn_3.addMouseListener(new MouseAdapter() {
@@ -85,7 +86,7 @@ public class MainWindow extends JFrame {
 		this.add(btn_3);
 		
 		y += height + padding;
-		JButton btn_4= new JButton("打印代码文件（Print）");
+		JButton btn_4 = new JButton("打印代码文件（Print）");
 		btn_4.setFocusPainted(false);
 		btn_4.setBounds(x, y, width, height);
 		btn_4.addMouseListener(new MouseAdapter() {
@@ -98,7 +99,7 @@ public class MainWindow extends JFrame {
 		this.add(btn_4);
 		
 		y += height + padding;
-		JButton btn_5= new JButton("打印哈夫曼树（Tree printing）");
+		JButton btn_5 = new JButton("打印哈夫曼树（Tree printing）");
 		btn_5.setFocusPainted(false);
 		btn_5.setBounds(x, y, width, height);
 		btn_5.addMouseListener(new MouseAdapter() {
@@ -116,7 +117,7 @@ public class MainWindow extends JFrame {
 		this.add(label_2);
 		
 		y += height + padding;
-		JButton btn_save= new JButton("保存哈夫曼树（Save）");
+		JButton btn_save = new JButton("保存哈夫曼树（Save）");
 		btn_save.setFocusPainted(false);
 		btn_save.setBounds(x, y, width, height);
 		btn_save.addMouseListener(new MouseAdapter() {
@@ -129,7 +130,7 @@ public class MainWindow extends JFrame {
 		this.add(btn_save);
 		
 		y += height + padding;
-		JButton btn_load= new JButton("读取哈夫曼树（Load）");
+		JButton btn_load = new JButton("读取哈夫曼树（Load）");
 		btn_load.setFocusPainted(false);
 		btn_load.setBounds(x, y, width, height);
 		btn_load.addMouseListener(new MouseAdapter() {
@@ -147,7 +148,7 @@ public class MainWindow extends JFrame {
 		this.add(label_3);
 		
 		y += height + padding;
-		JButton btn_6= new JButton("自动扫描文件，并生成哈夫曼树");
+		JButton btn_6 = new JButton("自动扫描文件，并生成哈夫曼树");
 		btn_6.setFocusPainted(false);
 		btn_6.setBounds(x, y, width, height);
 		btn_6.addMouseListener(new MouseAdapter() {
@@ -158,19 +159,6 @@ public class MainWindow extends JFrame {
 			}
 		});
 		this.add(btn_6);
-		
-		y += height + padding;
-		JButton btn_7= new JButton("哈夫曼树生成过程演示");
-		btn_7.setFocusPainted(false);
-		btn_7.setBounds(x, y, width, height);
-		btn_7.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				super.mouseClicked(e);
-				func_btn_7();
-			}
-		});
-		this.add(btn_7);
 		
 		y += height + padding;
 		JLabel label_4 = new JLabel("当前哈夫曼树信息：");
@@ -187,12 +175,114 @@ public class MainWindow extends JFrame {
 		this.treeWeight = new JLabel("总重量：未初始化");
 		this.treeWeight.setBounds(x, y, width, height);
 		this.add(this.treeWeight);
+		
+		y += height;
+		this.treeHeight = new JLabel("树高度：未初始化");
+		this.treeHeight.setBounds(x, y, width, height);
+		this.add(this.treeHeight);
+		
+		x -= 10;
+		y += height + padding;
+		JLabel label_5 = new JLabel("当前动画序列信息：");
+		label_5.setBounds(x, y, width, height);
+		this.add(label_5);
+		
+		x += 10;
+		y += height;
+		this.animate = new JLabel("没有存在的动画序列");
+		this.animate.setBounds(x, y, width, height);
+		this.add(this.animate);
+		
+		x -= 10;
+		y += height + padding/2;
+		width = 70;
+		padding = 5;
+		JButton btn_play = new JButton("播放");
+		btn_play.setFocusPainted(false);
+		btn_play.setBounds(x, y, width, height);
+		btn_play.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_play();
+			}
+		});
+		this.add(btn_play);
+		
+		x += width + padding;
+		JButton btn_pause = new JButton("暂停");
+		btn_pause.setFocusPainted(false);
+		btn_pause.setBounds(x, y, width, height);
+		btn_pause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_pause();
+			}
+		});
+		this.add(btn_pause);
+		
+		x += width + padding;
+		JButton btn_stop = new JButton("停止");
+		btn_stop.setFocusPainted(false);
+		btn_stop.setBounds(x, y, width, height);
+		btn_stop.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_stop();
+			}
+		});
+		this.add(btn_stop);
+		
+		x = 30;
+		padding = 10;
+		y += height + padding;
+		width = 220;
+		JLabel label_6 = new JLabel("动画播放速度");
+		label_6.setBounds(x, y, width, height);
+		this.add(label_6);
+		
+		x -= 10;
+		y += height + padding/2;
+		width = 70;
+		padding = 5;
+		JButton btn_slow = new JButton("-");
+		btn_slow.setFocusPainted(false);
+		btn_slow.setBounds(x, y, width, height);
+		btn_slow.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_slow();
+			}
+		});
+		this.add(btn_slow);
+		
+		x += width + padding;
+		this.speed = new JLabel("1.0");
+		this.speed.setBounds(x, y, width, height);
+		this.speed.setHorizontalAlignment(JLabel.CENTER);
+		this.add(this.speed);
+		
+		x += width + padding;
+		JButton btn_fast = new JButton("+");
+		btn_fast.setFocusPainted(false);
+		btn_fast.setBounds(x, y, width, height);
+		btn_fast.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_fast();
+			}
+		});
+		this.add(btn_fast);
 	}
 	
 	protected void createHelp() {
-		int x = 0, y = 564, width = 1018, height = 25;
+		int x = 0, y = 564 + 144, width = 1018 + 256, height = 25;
 		
-		this.help = new JTextField("欢迎使用数据结构演示程序！");
+		this.help = new JTextField("欢迎使用 数据结构课程设计演示系统！");
 		this.help.setEditable(false);
 		this.help.setBackground(Color.WHITE);
 		this.help.setBounds(x, y, width, height);
@@ -201,7 +291,7 @@ public class MainWindow extends JFrame {
 	}
 	
 	protected void createCanvas() {
-		int x = 260, y = 20, width = 738, height = 524;
+		int x = 260, y = 20, width = 738 + 256, height = 524 + 144;
 		
 		this.canvas = new CanvasPanel();
 		this.canvas.setBackground(Color.WHITE);
@@ -215,7 +305,10 @@ public class MainWindow extends JFrame {
 		if(Main.tree != null) {
 			this.treeNode.setText("节点数：" + Main.tree.size());
 			this.treeWeight.setText("总重量：" + Main.tree.weight());
+			this.treeHeight.setText("树高度：" + Main.tree.treeHeight());
+			this.animate.setText(Main.treeScene.animateName);
 		}
+		this.speed.setText(Double.toString(Main.treeScene.animateSpeed));
 	}
 	
 	public void active() {
@@ -234,5 +327,9 @@ public class MainWindow extends JFrame {
 	public void func_btn_save() {}
 	public void func_btn_load() {}
 	public void func_btn_6() {}
-	public void func_btn_7() {}
+	public void func_btn_play() {}
+	public void func_btn_pause() {}
+	public void func_btn_stop() {}
+	public void func_btn_slow() {}
+	public void func_btn_fast() {}
 }

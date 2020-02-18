@@ -1,5 +1,7 @@
 package pers.lagomoro.huffman;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,15 +14,19 @@ import java.util.Scanner;
 
 public class Main {
 
+	public static MainWindow window;
 	public static HuffmanTree<Character> tree;
 	public static Scanner scanner;
+	public static TreeScene treeScene;
 	
 	public static void main(String[] args) {
 		
 		tree = null;
 		scanner = new Scanner(System.in);
 		
-		MainWindow window = new MainWindow() {
+		treeScene = new TreeScene();
+		
+		window = new MainWindow() {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void func_btn_1() {
@@ -28,6 +34,8 @@ public class Main {
 				this.updateHelp("请在控制台中按照提示输入内容。");
 				tree = new HuffmanTree<Character>();
 				makeTreeFromInput(tree);
+				tree.outputTreeScene(treeScene);
+				window.canvas.setScene(treeScene);
 				this.updateHelp("初始化成功。");
 			}
 			@Override
@@ -53,6 +61,7 @@ public class Main {
 					this.updateHelp("哈夫曼树还没有初始化，无法解码。");
 				} else {
 					tree.Decoding("./codefile", "./textfile.txt");
+					window.canvas.setScene(treeScene);
 					this.updateHelp("解码成功，保存到：./textfile.txt。");
 				}
 			}
@@ -76,6 +85,7 @@ public class Main {
 					this.updateHelp("哈夫曼树还没有初始化，无法打印。");
 				}else {
 					treePrinting(tree, "./treeprint.txt");
+					window.canvas.setScene(treeScene);
 					this.updateHelp("凹入表已经打印到控制台，同时成功保存到：./treeprint.txt。");
 				}
 			}
@@ -99,6 +109,8 @@ public class Main {
 				} else {
 					tree = new HuffmanTree<Character>();
 					loadTreeFromFile(tree, "./hfmtree");
+					tree.outputTreeScene(treeScene);
+					window.canvas.setScene(treeScene);
 					this.updateHelp("从./hfmtree中读取哈夫曼树成功。");
 				}
 			}
@@ -112,35 +124,78 @@ public class Main {
 				} else {
 					tree = new HuffmanTree<Character>();
 					makeTreeFromFile(tree, "./tobetrans.txt");
+					tree.outputTreeScene(treeScene);
+					window.canvas.setScene(treeScene);
 					this.updateHelp("已完成：从./tobetrans.txt中自动分析字符权重。");
 				}
 			}
 			@Override
-			public void func_btn_7() {
-				super.func_btn_7();
+			public void func_btn_play() {
+				super.func_btn_play();
+				if(treeScene.animate == null) {
+					this.updateHelp("没有存在的动画序列，无法播放。");
+				} else if(window.canvas.isBusy) {
+					this.updateHelp("动画正在播放中，请勿重复点击。");
+				} else {
+					this.updateHelp("开始播放动画。");
+					treeScene.startAnimate(window.canvas);
+				}
+			}
+			@Override
+			public void func_btn_pause() {
+				super.func_btn_pause();
+				if(treeScene.animate == null) {
+					this.updateHelp("没有存在的动画序列，无法暂停。");
+				} else if(!window.canvas.isBusy) {
+					this.updateHelp("没有正在播放的动画序列，无需暂停。");
+				}else {
+					if (treeScene.animatePause == false) {
+						treeScene.animatePause = true;
+						this.updateHelp("动画暂停。");
+					} else if(treeScene.animatePause == true) {
+						treeScene.animatePause = false;
+						this.updateHelp("动画恢复。");
+					} 
+				}
+			}
+			@Override
+			public void func_btn_stop() {
+				super.func_btn_stop();
+				if(!window.canvas.isBusy) {
+					this.updateHelp("没有正在播放的动画序列，无需停止。");
+				} else {
+					treeScene.animateStop = true;
+					this.updateHelp("动画停止。");
+				} 
+			}
+			@Override
+			public void func_btn_slow() {
+				super.func_btn_slow();
+				if(treeScene.animateSpeed > 0.125) {
+					treeScene.animateSpeed /= 2;
+				}
+				this.updateHelp("成功修改动画播放速度：" + treeScene.animateSpeed);
+			}
+			@Override
+			public void func_btn_fast() {
+				super.func_btn_fast();
+				if(treeScene.animateSpeed < 16) {
+					treeScene.animateSpeed *= 2;
+				}
+				this.updateHelp("成功修改动画播放速度：" + treeScene.animateSpeed);
 			}
 		};
 		window.active();
 		
-		/*
-		//initialization(tree);
-		
-	    HashMap<Character, String> codeMap = new HashMap<Character, String>();
-	    tree.getCodeMap(codeMap);
-
-	    for (Character key : codeMap.keySet()) {
-	    	System.out.println(key + "," + codeMap.get(key));
-		}
-	    
-	    tree.output(System.out);
-	    System.out.println(tree.weight());
-	    tree.inOrderOutput(System.out);
-
-	    //tree.Coding("./tobetrans.txt", "./codefile.txt");
-	    //tree.Decoding("./codefile.txt", "./textfile.txt");
-
-	    treePrinting(tree);
-	    */
+		window.canvas.setScene(new Scene() {
+			@Override
+			public void paint(Graphics2D graphics, int width, int height) {
+				super.paint(graphics, width, height);
+				graphics.setColor(Color.BLACK);
+				this.setFontSize(graphics, 24);
+				graphics.drawString("欢迎使用 数据结构课程设计演示系统！", 300, 310);
+			}
+		});
 	}
 
 	public static void initialization(HuffmanTree<Character> tree) {
@@ -281,6 +336,39 @@ public class Main {
 				temp = temp / 2;
 			}
 		}
+		
+		String codeMapStr = "编码表：\n\n";
+		for(Character key : codeMap.keySet())
+			codeMapStr += key + " - " + codeMap.get(key) + "\n";
+		codeMapStr += "\n编码后的byte数组：\n\n";
+		for(int i = 0;i < buffer.length; i++) {
+			codeMapStr += buffer[i] + " ";
+			if(i % 15 == 14)
+				codeMapStr += "\n";
+		}
+		System.out.print(codeMapStr);
+		final String codeMapString = codeMapStr;
+		window.canvas.setScene(new Scene() {
+			@Override
+			public void paint(Graphics2D graphics, int width, int height) {
+				super.paint(graphics, width, height);
+				graphics.setColor(Color.BLACK);
+				String[] codes = codeMapString.split("\n");
+				int x = 90, y = 50;
+				for(int i = 0; i < codes.length; i++) {
+					if(i == 77 && codes.length >= 77) {
+						graphics.drawString("...受显示区域限制，完整code请查看./codefile", x, y);
+						break;
+					}
+					graphics.drawString(codes[i], x, y);
+					y += 15;
+					if(i == 38) {
+						x = 540;
+						y = 50;
+					}
+				}
+			}
+		});
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(new File(toFile));
 			fileOutputStream.write(buffer, 0, length);
@@ -322,6 +410,28 @@ public class Main {
 		}
 		
 		System.out.print(code);
+		final String codec = code;
+		window.canvas.setScene(new Scene() {
+			@Override
+			public void paint(Graphics2D graphics, int width, int height) {
+				super.paint(graphics, width, height);
+				graphics.setColor(Color.BLACK);
+				String[] codes = codec.split("\n");
+				int x = 90, y = 50;
+				for(int i = 0; i < codes.length; i++) {
+					if(i == 77 && codes.length >= 77) {
+						graphics.drawString("...受显示区域限制，完整code请查看./codeprint.txt", x, y);
+						break;
+					}
+					graphics.drawString(codes[i], x, y);
+					y += 15;
+					if(i == 38) {
+						x = 540;
+						y = 50;
+					}
+				}
+			}
+		});
 		try {
 			FileWriter fileWriter = new FileWriter(toFile);
 			fileWriter.write(code);
