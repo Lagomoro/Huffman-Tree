@@ -9,6 +9,7 @@ public class AnimateNode {
 	public int nodeID = -1;
 	public double x = -1;
 	public double y = -1;
+	public boolean checkpoint = false;
 	public Color color = null;
 	public String info = null;
 	

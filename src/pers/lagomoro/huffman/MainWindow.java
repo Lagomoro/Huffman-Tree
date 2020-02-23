@@ -16,6 +16,7 @@ public class MainWindow extends JFrame {
 	
 	JTextField help;
 	JLabel treeNode, treeWeight, treeHeight, animate, speed;
+	JButton btn_pause;
 	CanvasPanel canvas;
 
 	public MainWindow(){
@@ -49,12 +50,14 @@ public class MainWindow extends JFrame {
 		y += height + padding;
 		JButton btn_1 = new JButton("手动初始化（Initialization）");
 		btn_1.setFocusPainted(false);
+		//btn_1.setForeground(Color.lightGray);
 		btn_1.setBounds(x, y, width, height);
 		btn_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
 				func_btn_1();
+				//Main.window.updateHelp("JAR运行方式没有控制台，不支持手动输入。");
 			}
 		});
 		this.add(btn_1);
@@ -210,7 +213,7 @@ public class MainWindow extends JFrame {
 		this.add(btn_play);
 		
 		x += width + padding;
-		JButton btn_pause = new JButton("暂停");
+		btn_pause = new JButton("暂停");
 		btn_pause.setFocusPainted(false);
 		btn_pause.setBounds(x, y, width, height);
 		btn_pause.addMouseListener(new MouseAdapter() {
@@ -235,21 +238,52 @@ public class MainWindow extends JFrame {
 		});
 		this.add(btn_stop);
 		
+		
+		x = 20;
+		padding = 10;
+		y += height + padding/2;
+		width = 107;
+		padding = 6;
+		JButton btn_prev = new JButton("上一步");
+		btn_prev.setFocusPainted(false);
+		btn_prev.setBounds(x, y, width, height);
+		btn_prev.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_prev();
+			}
+		});
+		this.add(btn_prev);
+		
+		x += width + padding;
+		JButton btn_next = new JButton("下一步");
+		btn_next.setFocusPainted(false);
+		btn_next.setBounds(x, y, width, height);
+		btn_next.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				func_btn_next();
+			}
+		});
+		this.add(btn_next);
+		
 		x = 30;
 		padding = 10;
 		y += height + padding;
-		width = 220;
+		width = 90;
+		padding = 5;
 		JLabel label_6 = new JLabel("动画播放速度");
 		label_6.setBounds(x, y, width, height);
 		this.add(label_6);
 		
-		x -= 10;
-		y += height + padding/2;
-		width = 70;
-		padding = 5;
+		x += width + padding;
+		width = 25;
 		JButton btn_slow = new JButton("-");
 		btn_slow.setFocusPainted(false);
 		btn_slow.setBounds(x, y, width, height);
+		btn_slow.setMargin(new Insets(0, 0, 0, 0));
 		btn_slow.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -260,15 +294,18 @@ public class MainWindow extends JFrame {
 		this.add(btn_slow);
 		
 		x += width + padding;
+		width = 45;
 		this.speed = new JLabel("1.0");
 		this.speed.setBounds(x, y, width, height);
 		this.speed.setHorizontalAlignment(JLabel.CENTER);
 		this.add(this.speed);
 		
 		x += width + padding;
+		width = 25;
 		JButton btn_fast = new JButton("+");
 		btn_fast.setFocusPainted(false);
 		btn_fast.setBounds(x, y, width, height);
+		btn_fast.setMargin(new Insets(0, 0, 0, 0));
 		btn_fast.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -307,6 +344,7 @@ public class MainWindow extends JFrame {
 			this.treeWeight.setText("总重量：" + Main.tree.weight());
 			this.treeHeight.setText("树高度：" + Main.tree.treeHeight());
 			this.animate.setText(Main.treeScene.animateName);
+			this.btn_pause.setText(Main.treeScene.animatePause ? "继续" : "暂停");
 		}
 		this.speed.setText(Double.toString(Main.treeScene.animateSpeed));
 	}
@@ -330,6 +368,8 @@ public class MainWindow extends JFrame {
 	public void func_btn_play() {}
 	public void func_btn_pause() {}
 	public void func_btn_stop() {}
+	public void func_btn_prev() {}
+	public void func_btn_next() {}
 	public void func_btn_slow() {}
 	public void func_btn_fast() {}
 }

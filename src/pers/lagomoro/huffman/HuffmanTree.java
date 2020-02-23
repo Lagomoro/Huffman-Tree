@@ -115,9 +115,6 @@ public class HuffmanTree<T> {
 		ArrayList<AnimateNode> animateList = new ArrayList<AnimateNode>();//*Animate
 		AnimateNode animate;
 		int animateIndex = 0;
-		animate = new AnimateNode("info");
-		animate.info = "动画初始化 ...";
-		animateList.add(animate);//*Animate
 		for (T key : textMap.keySet()) {
 			this.push(key, textMap.get(key));
 			animate = new AnimateNode("move");//*Animate
@@ -127,8 +124,10 @@ public class HuffmanTree<T> {
 			animateList.add(animate);
 			animateIndex ++;//*Animate
 		}
-		animate = new AnimateNode("sleep");//*Animate
+		animate = new AnimateNode("info");
+		animate.info = "动画初始化 ...";
 		animate.sleepTime = 400;
+		animate.checkpoint = true;
 		animateList.add(animate);//*Animate
 		if (this.treeSize == 0) {
 			return;
@@ -241,6 +240,7 @@ public class HuffmanTree<T> {
 			animate = new AnimateNode("show");
 			animate.nodeID = this.treeSize;
 			animate.info = "合并根节点 " + min1 + " 号和 " + min2 + " 号，生成 " + this.treeSize + " 号节点 ...";
+			animate.checkpoint = true;
 			animate.sleepTime = 600;
 			animateList.add(animate);
 			for (int i = 0; i < this.treeSize; i++) {
@@ -261,9 +261,21 @@ public class HuffmanTree<T> {
 			animate.nodeID = i;
 			animateList.add(0, animate);
 		}
+		for (int i = 0;i < this.treeSize; i++) {
+			animate = new AnimateNode("resetColor");
+			animate.nodeID = i;
+			animateList.add(0, animate);
+			animate = new AnimateNode("resetPlace");
+			animate.nodeID = i;
+			animateList.add(0, animate);
+		}
+		animate = new AnimateNode("sleep");
+		animate.sleepTime = 0;
+		animateList.add(0, animate);
 		
-		animate = new AnimateNode("info");//*Animate
+		animate = new AnimateNode("info");
 		animate.info = "哈夫曼树生成动画完成。";
+		animate.checkpoint = true;
 		animate.sleepTime = 5000;
 		animateList.add(animate);
 		Main.treeScene.setAnimate(animateList.toArray(new AnimateNode[1]), "哈夫曼树生成动画");//Animate
@@ -407,6 +419,7 @@ public class HuffmanTree<T> {
 		AnimateNode animate;
 		animate = new AnimateNode("info");
 		animate.info = "动画初始化 ...";
+		animate.checkpoint = true;
 		animate.sleepTime = 400;
 		animateList.add(animate);//*Animate
 		
@@ -483,6 +496,7 @@ public class HuffmanTree<T> {
 				text += point.element;
 				animate = new AnimateNode("info");//*Animate
 				animate.info = "输出字符：" + point.element + " ..." + this.getDecodeAnimateText(code, i, text);
+				animate.checkpoint = true;
 				animate.sleepTime = 400;
 				animateList.add(animate);//*Animate
 				
@@ -508,8 +522,21 @@ public class HuffmanTree<T> {
 			e.printStackTrace();
 		}
 		
-		animate = new AnimateNode("info");//*Animate
+		for (int i = 0;i < this.treeSize; i++) {//*Animate
+			animate = new AnimateNode("resetColor");
+			animate.nodeID = i;
+			animateList.add(0, animate);
+			animate = new AnimateNode("resetPlace");
+			animate.nodeID = i;
+			animateList.add(0, animate);
+		}
+		animate = new AnimateNode("sleep");
+		animate.sleepTime = 0;
+		animateList.add(0, animate);
+		
+		animate = new AnimateNode("info");
 		animate.info = "解码动画完成。" + this.getDecodeAnimateText(code, code.length(), text);
+		animate.checkpoint = true;
 		animate.sleepTime = 5000;
 		animateList.add(animate);
 		Main.treeScene.setAnimate(animateList.toArray(new AnimateNode[1]), "解码动画");//Animate

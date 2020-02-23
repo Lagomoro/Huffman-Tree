@@ -169,6 +169,32 @@ public class Main {
 				} 
 			}
 			@Override
+			public void func_btn_prev() {
+				super.func_btn_prev();
+				if(!window.canvas.isBusy) {
+					this.updateHelp("没有正在播放的动画序列，请先播放。");
+				} else {
+					if(treeScene.setLastCheckpoint(window.canvas)) {
+						this.updateHelp("成功设置上一步。");
+					}else {
+						this.updateHelp("不存在上一个检查点。");
+					}
+				} 
+			}
+			@Override
+			public void func_btn_next() {
+				super.func_btn_next();
+				if(!window.canvas.isBusy) {
+					this.updateHelp("没有正在播放的动画序列，请先播放。");
+				} else {
+					if(treeScene.setNextCheckpoint(window.canvas)) {
+						this.updateHelp("成功设置下一步。");
+					}else {
+						this.updateHelp("不存在下一个检查点。");
+					}
+				} 
+			}
+			@Override
 			public void func_btn_slow() {
 				super.func_btn_slow();
 				if(treeScene.animateSpeed > 0.125) {

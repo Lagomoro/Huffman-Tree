@@ -19,6 +19,8 @@ public class TreeScene extends Scene {
 	public TreeSceneNode[] nodes = null;
 	public AnimateNode[] animate = null;
 	public String info = null;
+	public int nowFrame = 0;
+	public int jumpFrame = 0;
 	
 	public String animateName = "没有存在的动画序列";
 	public double animateSpeed = 1.0;
@@ -43,12 +45,16 @@ public class TreeScene extends Scene {
 		if(this.nodes != null && this.animate != null && !canvas.isBusy) {
 			new Thread(()->{
 				canvas.isBusy = true;
-				for(AnimateNode frame : animate) {
+				AnimateNode frame;
+				for(nowFrame = 0; nowFrame < animate.length; nowFrame ++) {
+					frame = animate[nowFrame];
+
 					switch(frame.animate) {
 					case "sleep":
 					case "info":
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -62,6 +68,7 @@ public class TreeScene extends Scene {
 						}
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -71,6 +78,7 @@ public class TreeScene extends Scene {
 							this.nodes[frame.nodeID].resetPlace();
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -82,6 +90,7 @@ public class TreeScene extends Scene {
 						}
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -91,6 +100,7 @@ public class TreeScene extends Scene {
 							this.nodes[frame.nodeID].resetColor();
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -100,6 +110,7 @@ public class TreeScene extends Scene {
 							this.nodes[frame.nodeID].hide = false;
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
@@ -109,19 +120,24 @@ public class TreeScene extends Scene {
 							this.nodes[frame.nodeID].hide = true;
 						if(frame.info != null)
 							info = frame.info;
+						if(jumpFrame > 0) {jumpFrame --; break;}
 						canvas.refresh();
 						if(frame.sleepTime > 0)
 							try {Thread.sleep((int)(frame.sleepTime / animateSpeed));} catch (InterruptedException e) {e.printStackTrace();}
 						break;
 					}
-					while(animatePause) {
+					while(animatePause && jumpFrame <= 0) {
+						canvas.refresh();
 						try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
-						if(animateStop)
+						if(animateStop && jumpFrame <= 0)
 							animatePause = false;
 					}
 					if(animateStop){
 						animateStop = false;
-						break;
+						if(jumpFrame > 0)
+							nowFrame = 0;
+						else
+							break;
 					}
 				}
 				this.info = null;
@@ -135,6 +151,48 @@ public class TreeScene extends Scene {
 				Main.window.updateHelp("动画播放完毕。");
 			}).start();
 		}
+	}
+	
+	public int getLastCheckpoint(){
+		for(int i = this.nowFrame - 1; i > 0;i--) {
+			if(this.animate[i].checkpoint) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public boolean setLastCheckpoint(CanvasPanel canvas){
+		if(canvas.isBusy) {
+			if(this.getLastCheckpoint() != -1) {
+				this.jumpFrame = this.getLastCheckpoint();
+				this.animatePause = true;
+				this.animateStop = true;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int getNextCheckpoint(){
+		for(int i = this.nowFrame + 1; i < this.animate.length;i++) {
+			if(this.animate[i].checkpoint) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public boolean setNextCheckpoint(CanvasPanel canvas){
+		if(canvas.isBusy) {
+			if(this.getNextCheckpoint() != -1) {
+				this.jumpFrame = this.getNextCheckpoint();
+				this.animatePause = true;
+				this.animateStop = true;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
